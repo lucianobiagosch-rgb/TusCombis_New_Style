@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TusCombis - Pasajero</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ===== RESET & BASE ===== */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --green:       #00C853;
+  --green-dark:  #00A844;
+  --green-light: #E8FFF1;
+  --text:        #1A1A2E;
+  --muted:       #6B7280;
+  --border:      #E5E7EB;
+  --white:       #FFFFFF;
+  --bg:          #F7F8FA;
+  --yellow:      #FFB300;
+  --red:         #EF4444;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: #D0D0D0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 24px 16px;
+}
+
+/* ===== PHONE SHELL ===== */
+.phone {
+  width: 390px;
+  min-height: 844px;
+  background: var(--bg);
+  border-radius: 48px;
+  overflow: hidden;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.30);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== SCREEN SYSTEM ===== */
+.screen {
+  display: none;
+  flex-direction: column;
+  min-height: 844px;
+}
+.screen.active { display: flex; }
+
+/* ===== TOP BAR ===== */
+.topbar {
+  background: var(--green);
+  padding: 52px 20px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+.topbar h1 { font-size: 17px; font-weight: 700; color: #fff; flex: 1; }
+.back-btn, .refresh-btn {
+  background: rgba(255,255,255,0.2);
+  border: none;
+  border-radius: 50%;
+  width: 38px; height: 38px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  color: #fff;
+  font-size: 18px;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.back-btn:hover, .refresh-btn:hover { background: rgba(255,255,255,0.3); }
+
+/* ===== CONTENT AREA ===== */
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  -webkit-overflow-scrolling: touch;
+}
+.content::-webkit-scrollbar { display: none; }
+
+/* ===== SECTION TITLE ===== */
+.section-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 14px;
+}
+
+/* ===== BUTTONS ===== */
+.btn-main {
+  background: var(--green);
+  color: #fff;
+  border: none;
+  border-radius: 16px;
+  padding: 16px;
+  width: 100%;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  margin-top: 10px;
+  transition: background 0.15s, transform 0.1s;
+  display: block;
+  text-align: center;
+}
+.btn-main:active { transform: scale(0.98); background: var(--green-dark); }
+
+.btn-outline {
+  background: var(--white);
+  color: var(--green-dark);
+  border: 2px solid var(--green);
+  border-radius: 16px;
+  padding: 14px;
+  width: 100%;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  margin-top: 10px;
+  transition: background 0.15s;
+}
+.btn-outline:hover { background: var(--green-light); }
+
+.btn-danger {
+  background: #FEE2E2;
+  color: #B91C1C;
+  border: none;
+  border-radius: 16px;
+  padding: 14px;
+  width: 100%;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  margin-top: 10px;
+}
+
+/* ===== TAB BAR ===== */
+.tab-bar {
+  background: var(--white);
+  border-top: 1px solid var(--border);
+  display: flex;
+  padding: 10px 0 24px;
+  flex-shrink: 0;
+}
+.tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.tab-icon { font-size: 22px; }
+.tab-label { font-size: 10px; font-weight: 600; color: var(--muted); }
+.tab.active .tab-label { color: var(--green); }
+.tab.active .tab-icon { filter: saturate(1.5); }
+
+/* ===== MENU SCREEN ===== */
+.logo-bar { background: var(--green); padding: 52px 20px 0; }
+.logo-pill {
+  background: rgba(255,255,255,0.15);
+  border: 1.5px solid rgba(255,255,255,0.3);
+  border-radius: 20px;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.logo-pill span { font-size: 24px; font-weight: 800; color: #fff; letter-spacing: -1px; }
+.greeting-box {
+  background: linear-gradient(135deg, var(--green), var(--green-dark));
+  border-radius: 20px;
+  padding: 20px;
+  margin: 16px 0 20px;
+  color: #fff;
+}
+.greeting-box h2 { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
+.greeting-box p  { font-size: 13px; opacity: 0.85; }
+
+.menu-item {
+  background: var(--white);
+  border-radius: 16px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  border: 1.5px solid var(--border);
+  transition: border-color 0.15s, transform 0.1s;
+  text-decoration: none;
+}
+.menu-item:active { transform: scale(0.98); border-color: var(--green); }
+.menu-icon {
+  width: 46px; height: 46px;
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.menu-text { flex: 1; }
+.menu-text strong { display: block; font-size: 14px; font-weight: 700; color: var(--text); }
+.menu-text small  { font-size: 11px; color: var(--muted); }
+.menu-arrow { color: var(--muted); font-size: 18px; }
+
+/* ===== VIAJES DISPONIBLES ===== */
+.trip-card {
+  background: var(--white);
+  border-radius: 18px;
+  padding: 18px;
+  margin-bottom: 14px;
+  cursor: pointer;
+  border: 2px solid var(--border);
+  transition: border-color 0.15s, transform 0.1s;
+}
+.trip-card:hover { border-color: var(--green); }
+.trip-card:active { transform: scale(0.99); }
+.trip-time { font-size: 40px; font-weight: 800; color: var(--text); letter-spacing: -2px; line-height: 1; }
+.trip-route { font-size: 13px; font-weight: 600; color: var(--green-dark); margin-top: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+.trip-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.tag { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; }
+.tag-green  { background: var(--green-light); color: var(--green-dark); }
+.tag-yellow { background: #FFF8E1; color: #B45309; }
+.tag-gray   { background: #F3F4F6; color: var(--muted); }
+
+/* ===== TIPO RESERVA ===== */
+.type-card {
+  background: var(--white);
+  border-radius: 18px;
+  padding: 20px;
+  margin-bottom: 14px;
+  cursor: pointer;
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: border-color 0.15s, background 0.15s;
+}
+.type-card.selected { border-color: var(--green); background: var(--green-light); }
+.type-icon { font-size: 36px; }
+.type-info strong { display: block; font-size: 17px; font-weight: 800; color: var(--text); }
+.type-info small  { font-size: 12px; color: var(--muted); margin-top: 2px; display: block; }
+.radio-dot {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  margin-left: auto;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: border-color 0.15s;
+}
+.radio-dot.on { border-color: var(--green); }
+.radio-dot.on::after { content: ''; width: 12px; height: 12px; border-radius: 50%; background: var(--green); display: block; }
+
+/* ===== DÍAS SEMANA ===== */
+.week-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-bottom: 18px;
+}
+.wday {
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 0;
+  border: 2px solid var(--border);
+  cursor: pointer;
+  background: var(--white);
+  transition: all 0.15s;
+}
+.wday.selected { border-color: var(--green); background: var(--green); }
+.wday .wl { font-size: 13px; font-weight: 800; color: var(--text); }
+.wday.selected .wl { color: #fff; }
+
+.pills-box {
+  background: var(--white);
+  border-radius: 16px;
+  padding: 14px 16px;
+  border: 1.5px solid var(--border);
+  margin-bottom: 16px;
+}
+.pills-wrap { display: flex; flex-wrap: wrap; gap: 6px; min-height: 28px; }
+.pill {
+  background: var(--green-light);
+  color: var(--green-dark);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 20px;
+}
+
+/* ===== DÍAS DIARIA ===== */
+.day-row {
+  background: var(--white);
+  border-radius: 16px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: all 0.15s;
+}
+.day-row.selected { border-color: var(--green); background: var(--green-light); }
+.day-av {
+  width: 46px; height: 46px;
+  border-radius: 12px;
+  background: var(--green-light);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: 800;
+  color: var(--green-dark);
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.day-row.selected .day-av { background: var(--green); color: #fff; }
+.day-info strong { display: block; font-size: 15px; font-weight: 700; color: var(--text); }
+.day-info small  { font-size: 12px; color: var(--muted); }
+.day-check { margin-left: auto; color: var(--green); font-size: 20px; opacity: 0; transition: opacity 0.15s; }
+.day-row.selected .day-check { opacity: 1; }
+
+/* ===== PAGO ===== */
+.pago-card {
+  background: var(--white);
+  border-radius: 20px;
+  padding: 22px;
+  margin-bottom: 14px;
+  cursor: pointer;
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  transition: all 0.15s;
+}
+.pago-card.selected { border-color: var(--green); background: var(--green-light); }
+.pago-icon { width: 60px; height: 60px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 30px; flex-shrink: 0; }
+.pago-info strong { display: block; font-size: 17px; font-weight: 800; color: var(--text); }
+.pago-info small  { font-size: 12px; color: var(--muted); margin-top: 2px; display: block; }
+
+/* ===== RESERVA CONFIRMADA ===== */
+.confirm-card {
+  background: var(--white);
+  border-radius: 20px;
+  padding: 20px;
+  border: 1.5px solid var(--border);
+  margin-bottom: 16px;
+}
+.confirm-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.confirm-row:last-child { border-bottom: none; }
+.confirm-icon {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  background: var(--green-light);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.confirm-label { font-size: 11px; color: var(--muted); margin-bottom: 2px; }
+.confirm-value { font-size: 15px; font-weight: 700; color: var(--text); }
+
+/* ===== MIS VIAJES ===== */
+.tab-switcher {
+  display: flex;
+  margin-bottom: 18px;
+  background: var(--white);
+  border-radius: 14px;
+  padding: 4px;
+  border: 1.5px solid var(--border);
+}
+.tab-sw {
+  flex: 1;
+  padding: 10px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.tab-sw.active { background: var(--green); color: #fff; }
+
+.viaje-card {
+  background: var(--white);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 12px;
+  border: 1.5px solid var(--border);
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.viaje-card:hover { border-color: var(--green); }
+.viaje-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+.viaje-route { font-size: 16px; font-weight: 800; color: var(--text); }
+.viaje-sub   { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.viaje-date  { font-size: 12px; color: var(--muted); text-align: right; line-height: 1.6; }
+.viaje-meta  { display: flex; gap: 8px; align-items: center; }
+.status { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+.status-active { background: var(--green-light); color: var(--green-dark); }
+.status-done   { background: #F3F4F6; color: var(--muted); }
+
+/* ===== QR ===== */
+.qr-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.qr-avatar {
+  width: 72px; height: 72px;
+  background: var(--green);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; font-weight: 800;
+  color: #fff;
+  margin-bottom: 14px;
+}
+.qr-name { font-size: 22px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+.qr-sub  { font-size: 13px; color: var(--muted); margin-bottom: 26px; }
+.qr-box  {
+  background: var(--white);
+  border-radius: 20px;
+  padding: 22px;
+  border: 2px solid var(--border);
+}
+.qr-footer { margin-top: 18px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.qr-hint { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+.qr-trip { background: var(--green-light); color: var(--green-dark); font-size: 12px; font-weight: 700; padding: 6px 20px; border-radius: 20px; }
+
+/* ===== NOTICIAS ===== */
+.noticia-card {
+  background: var(--white);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 14px;
+  border: 1.5px solid var(--border);
+}
+.noticia-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.noticia-logo   { width: 34px; height: 34px; background: var(--green); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+.noticia-nombre { font-size: 13px; font-weight: 700; color: var(--green-dark); margin-left: 8px; }
+.noticia-fecha  { font-size: 11px; color: var(--muted); }
+.noticia-titulo { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+.noticia-body   { font-size: 13px; color: var(--muted); line-height: 1.55; }
+.noticia-tag    { display: inline-block; font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 20px; margin-top: 8px; }
+.noticia-tag-novedad  { background: var(--green-light); color: var(--green-dark); }
+.noticia-tag-aviso    { background: #FFF8E1; color: #B45309; }
+.noticia-tag-sistema  { background: #EFF6FF; color: #1D4ED8; }
+
+/* ===== PRECIOS ===== */
+.precio-card {
+  background: var(--white);
+  border-radius: 16px;
+  padding: 16px 18px;
+  margin-bottom: 10px;
+  border: 1.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.precio-amount  { font-size: 22px; font-weight: 800; color: var(--text); min-width: 80px; }
+.precio-divider { width: 2px; height: 36px; background: var(--green-light); border-radius: 2px; flex-shrink: 0; }
+.precio-label   { font-size: 14px; font-weight: 700; color: var(--text); }
+.precio-sub     { font-size: 11px; color: var(--muted); }
+
+/* ===== PARADAS DETALLE ===== */
+.route-container { position: relative; padding-left: 28px; }
+.route-line {
+  position: absolute;
+  left: 9px; top: 24px; bottom: 24px;
+  width: 3px;
+  background: linear-gradient(to bottom, var(--green), var(--yellow));
+  border-radius: 4px;
+}
+.stop-row { position: relative; margin-bottom: 14px; }
+.stop-dot {
+  position: absolute;
+  left: -23px; top: 20px;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--green);
+  border: 2.5px solid var(--white);
+  box-shadow: 0 0 0 2px var(--green);
+}
+.stop-dot.end { background: var(--yellow); box-shadow: 0 0 0 2px var(--yellow); }
+.stop-card {
+  background: var(--white);
+  border-radius: 16px;
+  padding: 14px 16px;
+  border: 1.5px solid var(--border);
+}
+.stop-card.end { border-color: var(--yellow); }
+.stop-name   { font-size: 15px; font-weight: 700; color: var(--text); }
+.stop-detail { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.stop-badge  { display: inline-block; font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 20px; margin-top: 6px; }
+.stop-badge-green  { background: var(--green-light); color: var(--green-dark); }
+.stop-badge-yellow { background: #FFF8E1; color: #B45309; }
+
+/* ===== MAPA SEGUIMIENTO ===== */
+.map-status-bar {
+  background: rgba(26,26,46,0.90);
+  padding: 10px 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.map-status-bar span { font-size: 12px; color: #fff; font-weight: 600; }
+.pulse {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--green);
+  flex-shrink: 0;
+  animation: pulse 1.8s infinite;
+}
+@keyframes pulse {
+  0%   { box-shadow: 0 0 0 0   rgba(0,200,83,0.6); }
+  70%  { box-shadow: 0 0 0 8px rgba(0,200,83,0); }
+  100% { box-shadow: 0 0 0 0   rgba(0,200,83,0); }
+}
+.eta-pill { background: var(--green); color: #fff; font-size: 12px; font-weight: 700; padding: 4px 14px; border-radius: 20px; margin-left: auto; }
+
+.map-area { flex: 1; position: relative; overflow: hidden; background: #f0ebe0; min-height: 340px; }
+.map-svg  { width: 100%; height: 100%; }
+
+@keyframes moveVan {
+  0%   { transform: translate(145px, 255px); }
+  50%  { transform: translate(175px, 215px); }
+  100% { transform: translate(145px, 255px); }
+}
+.van-marker { animation: moveVan 4s ease-in-out infinite; }
+
+.map-overlay {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: var(--white);
+  border-radius: 20px 20px 0 0;
+  padding: 18px 20px 24px;
+  box-shadow: 0 -6px 24px rgba(0,0,0,0.12);
+}
+.map-overlay-title { font-size: 16px; font-weight: 800; color: var(--text); }
+.map-overlay-sub   { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.eta-big  { font-size: 26px; font-weight: 800; color: var(--green); }
+.eta-unit { font-size: 11px; color: var(--muted); }
+
+.stop-list-mini { display: flex; flex-direction: column; gap: 2px; margin-top: 14px; }
+.stop-mini {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  border-radius: 12px;
+}
+.stop-mini.current { background: var(--green-light); }
+.mini-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.mini-name { flex: 1; font-size: 13px; font-weight: 700; color: var(--text); }
+.mini-name.done { color: var(--muted); text-decoration: line-through; }
+.mini-time { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.mini-eta  { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 12px; flex-shrink: 0; }
+.mini-eta-green { background: var(--green); color: #fff; }
+.mini-eta-done  { background: #F3F4F6; color: var(--muted); }
+.mini-eta-light { background: var(--green-light); color: var(--green-dark); }
+
+/* ===== UTILITY ===== */
+.disabled-card { opacity: 0.4; pointer-events: none; border-style: dashed !important; }
+.flex-between  { display: flex; justify-content: space-between; align-items: flex-start; }
+.spacer-sm     { height: 8px; }
+.spacer-md     { height: 16px; }
+</style>
+</head>
+<body>
+<div class="phone">
+
+<!-- ================================================================ -->
+<!-- S1: MENÚ PRINCIPAL                                                -->
+<!-- ================================================================ -->
+<div class="screen active" id="s1">
+  <div class="logo-bar" style="background:var(--green); padding: 52px 20px 0;">
+    <div class="logo-pill">
+      <span style="font-size:28px;">🚐</span>
+      <span>TusCombis</span>
+    </div>
+    <div style="padding: 14px 20px 20px;">
+      <div class="greeting-box">
+        <h2>¡Buen día, Juan! 👋</h2>
+        <p>¿A dónde viajás hoy?</p>
+      </div>
+    </div>
+  </div>
+  <div class="content" style="padding-top: 4px;">
+    <div class="section-title">Accesos rápidos</div>
+    <div class="menu-item" onclick="goTo('s2')">
+      <div class="menu-icon" style="background:#E8FFF1;">🎟️</div>
+      <div class="menu-text"><strong>Hacer Reserva</strong><small>Elegí tu recorrido y fecha</small></div>
+      <span class="menu-arrow">›</span>
+    </div>
+    <div class="menu-item" onclick="goTo('sMisViajes')">
+      <div class="menu-icon" style="background:#FFF8E1;">🗺️</div>
+      <div class="menu-text"><strong>Mis Viajes</strong><small>Historial y próximos viajes</small></div>
+      <span class="menu-arrow">›</span>
+    </div>
+    <div class="menu-item" onclick="goTo('sQR')">
+      <div class="menu-icon" style="background:#EFF6FF;">📱</div>
+      <div class="menu-text"><strong>Código QR</strong><small>Tu pase digital para subir</small></div>
+      <span class="menu-arrow">›</span>
+    </div>
+    <div class="menu-item" onclick="goTo('sListaLlegadas')">
+      <div class="menu-icon" style="background:#FFF0F0;">📍</div>
+      <div class="menu-text"><strong>Llegadas</strong><small>Seguí tu combi en tiempo real</small></div>
+      <span class="menu-arrow">›</span>
+    </div>
+    <div class="menu-item" onclick="goTo('sNoticias')">
+      <div class="menu-icon" style="background:#F3F0FF;">📰</div>
+      <div class="menu-text"><strong>Noticias</strong><small>Avisos y novedades</small></div>
+      <span class="menu-arrow">›</span>
+    </div>
+    <div class="menu-item" onclick="goTo('sPrecios')">
+      <div class="menu-icon" style="background:#FFFBE6;">💲</div>
+      <div class="menu-text"><strong>Precios</strong><small>Tarifas vigentes</small></div>
+      <span class="menu-arrow">›</span>
+    </div>
+    <div class="menu-item" onclick="goTo('sListaParadas')">
+      <div class="menu-icon" style="background:#F0FFF4;">🗺️</div>
+      <div class="menu-text"><strong>Paradas</strong><small>Ver todos los puntos de parada</small></div>
+      <span class="menu-arrow">›</span>
+    </div>
+  </div>
+  <div class="tab-bar">
+    <div class="tab active"><span class="tab-icon">🏠</span><span class="tab-label">Inicio</span></div>
+    <div class="tab" onclick="goTo('s2')"><span class="tab-icon">🗓️</span><span class="tab-label">Reservar</span></div>
+    <div class="tab" onclick="goTo('sMisViajes')"><span class="tab-icon">🧾</span><span class="tab-label">Mis viajes</span></div>
+    <div class="tab" onclick="goTo('sQR')"><span class="tab-icon">📲</span><span class="tab-label">Mi QR</span></div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- S2: VIAJES DISPONIBLES                                            -->
+<!-- ================================================================ -->
+<div class="screen" id="s2">
+  <div class="topbar"><button class="back-btn" onclick="goTo('s1')">←</button><h1>Viajes disponibles</h1></div>
+  <div class="content">
+    <div class="section-title">Hoy · Jueves 30 Abr 2026</div>
+    <div class="trip-card" onclick="goTo('s3')">
+      <div class="trip-time">06:00</div>
+      <div class="trip-route">📍 Inversiones 180</div>
+      <div class="trip-tags">
+        <span class="tag tag-green">🌅 Mañana</span>
+        <span class="tag tag-yellow">⚡ Pocos lugares</span>
+      </div>
+    </div>
+    <div class="trip-card" onclick="goTo('s3')">
+      <div class="trip-time">13:00</div>
+      <div class="trip-route">📍 Acapulco</div>
+      <div class="trip-tags">
+        <span class="tag tag-green">☀️ Tarde</span>
+      </div>
+    </div>
+    <div class="trip-card disabled-card">
+      <div class="trip-time" style="color:var(--muted);">18:00</div>
+      <div class="trip-route" style="color:var(--muted);">📍 Centro</div>
+      <div class="trip-tags">
+        <span class="tag tag-gray">Sin disponibilidad</span>
+      </div>
+    </div>
+  </div>
+  <div class="tab-bar">
+    <div class="tab" onclick="goTo('s1')"><span class="tab-icon">🏠</span><span class="tab-label">Inicio</span></div>
+    <div class="tab active"><span class="tab-icon">🗓️</span><span class="tab-label">Reservar</span></div>
+    <div class="tab" onclick="goTo('sMisViajes')"><span class="tab-icon">🧾</span><span class="tab-label">Mis viajes</span></div>
+    <div class="tab" onclick="goTo('sQR')"><span class="tab-icon">📲</span><span class="tab-label">Mi QR</span></div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- S3: TIPO DE RESERVA                                               -->
+<!-- ================================================================ -->
+<div class="screen" id="s3">
+  <div class="topbar"><button class="back-btn" onclick="goTo('s2')">←</button><h1>Tipo de reserva</h1></div>
+  <div class="content">
+    <div class="section-title">Seleccioná tu modalidad</div>
+    <div class="type-card" id="tc1" onclick="selectType('mensual')">
+      <span class="type-icon">📅</span>
+      <div class="type-info">
+        <strong>Reserva Mensual</strong>
+        <small>Elegí qué días de la semana viajás</small>
+      </div>
+      <div class="radio-dot" id="rd1"></div>
+    </div>
+    <div class="type-card" id="tc2" onclick="selectType('diaria')">
+      <span class="type-icon">🗓️</span>
+      <div class="type-info">
+        <strong>Reserva Diaria</strong>
+        <small>Elegí una fecha específica</small>
+      </div>
+      <div class="radio-dot" id="rd2"></div>
+    </div>
+    <button class="btn-main" onclick="goToDias()">Continuar →</button>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- S4A: MENSUAL – días de la semana                                  -->
+<!-- ================================================================ -->
+<div class="screen" id="sMensual">
+  <div class="topbar"><button class="back-btn" onclick="goTo('s3')">←</button><h1>Elegí los días</h1></div>
+  <div class="content">
+    <div class="section-title">Días de la semana que viajás</div>
+    <div class="week-grid">
+      <div class="wday" data-d="0" onclick="toggleWDay(0)"><span class="wl">Lu</span></div>
+      <div class="wday" data-d="1" onclick="toggleWDay(1)"><span class="wl">Ma</span></div>
+      <div class="wday" data-d="2" onclick="toggleWDay(2)"><span class="wl">Mi</span></div>
+      <div class="wday" data-d="3" onclick="toggleWDay(3)"><span class="wl">Ju</span></div>
+      <div class="wday" data-d="4" onclick="toggleWDay(4)"><span class="wl">Vi</span></div>
+      <div class="wday" data-d="5" onclick="toggleWDay(5)"><span class="wl">Sa</span></div>
+      <div class="wday" data-d="6" onclick="toggleWDay(6)"><span class="wl">Do</span></div>
+    </div>
+    <div class="pills-box">
+      <div class="section-title" style="margin-bottom:8px;">Días seleccionados</div>
+      <div class="pills-wrap" id="wPills">
+        <span style="color:var(--muted);font-size:13px;">Ningún día seleccionado</span>
+      </div>
+    </div>
+    <button class="btn-main" onclick="goTo('sPago')">Continuar →</button>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- S4B: DIARIA – próximos 10 días                                    -->
+<!-- ================================================================ -->
+<div class="screen" id="sDiaria">
+  <div class="topbar"><button class="back-btn" onclick="goTo('s3')">←</button><h1>Elegí el día</h1></div>
+  <div class="content">
+    <div class="section-title">Próximos días disponibles</div>
+    <div id="diasList"></div>
+    <button class="btn-main" onclick="goTo('sPago')">Continuar →</button>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- S5: FORMA DE PAGO                                                 -->
+<!-- ================================================================ -->
+<div class="screen" id="sPago">
+  <div class="topbar"><button class="back-btn" onclick="goTo('s3')">←</button><h1>Forma de pago</h1></div>
+  <div class="content">
+    <div class="section-title">Seleccioná tu método de pago</div>
+    <div class="pago-card" id="p1" onclick="selectPago('eventual')">
+      <div class="pago-icon" style="background:#FFF8E1;">💵</div>
+      <div class="pago-info">
+        <strong>Eventual</strong>
+        <small>Pagás al subir al vehículo</small>
+      </div>
+      <div class="radio-dot" id="pr1" style="margin-left:auto;"></div>
+    </div>
+    <div class="pago-card" id="p2" onclick="selectPago('abonado')">
+      <div class="pago-icon" style="background:#E8FFF1;">📲</div>
+      <div class="pago-info">
+        <strong>Abonado</strong>
+        <small>Tenés un abono mensual activo</small>
+      </div>
+      <div class="radio-dot" id="pr2" style="margin-left:auto;"></div>
+    </div>
+    <button class="btn-main" onclick="goTo('sConfirmacion')">Confirmar reserva →</button>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- S6: RESERVA CONFIRMADA                                            -->
+<!-- ================================================================ -->
+<div class="screen" id="sConfirmacion">
+  <div class="topbar"><button class="back-btn" onclick="goTo('s1')">←</button><h1>Reserva confirmada</h1></div>
+  <div class="content">
+    <div style="text-align:center; padding: 12px 0 20px;">
+      <div style="font-size:56px; margin-bottom:10px;">✅</div>
+      <div style="font-size:20px; font-weight:800; color:var(--text);">¡Reserva exitosa!</div>
+      <div style="font-size:13px; color:var(--muted); margin-top:4px;">Centro Bus</div>
+    </div>
+    <div class="confirm-card">
+      <div class="confirm-row">
+        <div class="confirm-icon">🚐</div>
+        <div><div class="confirm-label">Viaje seleccionado</div><div class="confirm-value">Acapulco</div></div>
+      </div>
+      <div class="confirm-row">
+        <div class="confirm-icon">🕐</div>
+        <div><div class="confirm-label">Horario</div><div class="confirm-value">13:00 hs</div></div>
+      </div>
+      <div class="confirm-row">
+        <div class="confirm-icon">📍</div>
+        <div><div class="confirm-label">Parada de subida</div><div class="confirm-value">General Anaya</div></div>
+      </div>
+      <div class="confirm-row">
+        <div class="confirm-icon">📅</div>
+        <div><div class="confirm-label">Fecha</div><div class="confirm-value">Jueves 2026-04-30</div></div>
+      </div>
+      <div class="confirm-row">
+        <div class="confirm-icon">💳</div>
+        <div><div class="confirm-label">Forma de pago</div><div class="confirm-value">Abonado</div></div>
+      </div>
+    </div>
+    <button class="btn-main" onclick="goTo('sQR')">Ver código QR →</button>
+    <button class="btn-outline" onclick="goTo('s2')">Editar reserva</button>
+    <button class="btn-danger">Cancelar reserva</button>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- S7: MIS VIAJES                                                    -->
+<!-- ================================================================ -->
+<div class="screen" id="sMisViajes">
+  <div class="topbar"><button class="back-btn" onclick="goTo('s1')">←</button><h1>Mis Viajes</h1></div>
+  <div class="content">
+    <div class="tab-switcher">
+      <div class="tab-sw active" id="tw1" onclick="switchViajes('futuras')">Próximas</div>
+      <div class="tab-sw"        id="tw2" onclick="switchViajes('pasadas')">Pasadas</div>
+    </div>
+    <div id="vFuturas">
+      <div class="section-title">Reservas activas</div>
+      <div class="viaje-card" onclick="goTo('sConfirmacion')">
+        <div class="viaje-top">
+          <div><div class="viaje-route">🚐 Acapulco</div><div class="viaje-sub">Centro Bus · General Anaya</div></div>
+          <div class="viaje-date">2026-04-30<br>13:00 hs</div>
+        </div>
+        <div class="viaje-meta"><span class="status status-active">Activa</span><span style="font-size:12px;color:var(--muted);">Abonado</span></div>
+      </div>
+      <div class="viaje-card" onclick="goTo('sConfirmacion')">
+        <div class="viaje-top">
+          <div><div class="viaje-route">🚐 Inversiones 180</div><div class="viaje-sub">Centro Bus · Panteón Militar</div></div>
+          <div class="viaje-date">2026-05-02<br>06:00 hs</div>
+        </div>
+        <div class="viaje-meta"><span class="status status-active">Activa</span><span style="font-size:12px;color:var(--muted);">Eventual</span></div>
+      </div>
+    </div>
+    <div id="vPasadas" style="display:none;">
+      <div class="section-title">Historial</div>
+      <div class="viaje-card">
+        <div class="viaje-top">
+          <div><div class="viaje-route">🚐 Acapulco</div><div class="viaje-sub">Centro Bus · General Anaya</div></div>
+          <div class="viaje-date">2026-04-28<br>13:00 hs</div>
+        </div>
+        <div class="viaje-meta"><span class="status status-done">Completado</span></div>
+      </div>
+      <div class="viaje-card">
+        <div class="viaje-top">
+          <div><div class="viaje-route">🚐 Acapulco</div><div class="viaje-sub">Centro Bus · General Anaya</div></div>
+          <div class="viaje-date">2026-04-25<br>13:00 hs</div>
+        </div>
+        <div class="viaje-meta"><span class="status status-done">Completado</span></div>
+      </div>
+      <div class="viaje-card">
+        <div class="viaje-top">
+          <div><div class="viaje-route">🚐 Inversiones 180</div><div class="viaje-sub">Centro Bus · Carrera 23 A</div></div>
+          <div class="viaje-date">2026-04-23<br>06:00 hs</div>
+        </div>
+        <div class="viaje-meta"><span class="status status-done">Completado</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="tab-bar">
+    <div class="tab" onclick="goTo('s1')"><span class="tab-icon">🏠</span><span class="tab-label">Inicio</span></div>
+    <div class="tab" onclick="goTo('s2')"><span class="tab-icon">🗓️</span><span class="tab-label">Reservar</span></div>
+    <div class="tab active"><span class="tab-icon">🧾</span><span class="tab-label">Mis viajes</span></div>
+    <div class="tab" onclick="goTo('sQR')"><span class="tab-icon">📲</span><span class="tab-label">Mi QR</span></div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- S8: CÓDIGO QR                                                     -->
+<!-- ================================================================ -->
+<div class="screen" id="sQR">
+  <div class="topbar"><button class="back-btn" onclick="goTo('s1')">←</button><h1>Código QR</h1></div>
+  <div class="qr-wrapper">
+    <div class="qr-avatar">LB</div>
+    <div class="qr-name">Lucho Biagosch</div>
+    <div class="qr-sub">Mostrá este código al conductor</div>
+    <div class="qr-box">
+      <svg width="190" height="190" viewBox="0 0 190 190" xmlns="http://www.w3.org/2000/svg">
+        <rect width="190" height="190" fill="white"/>
+        <!-- Finder TL -->
+        <rect x="10" y="10" width="54" height="54" rx="4" fill="#111"/>
+        <rect x="16" y="16" width="42" height="42" rx="2" fill="white"/>
+        <rect x="22" y="22" width="30" height="30" rx="1" fill="#111"/>
+        <!-- Finder TR -->
+        <rect x="126" y="10" width="54" height="54" rx="4" fill="#111"/>
+        <rect x="132" y="16" width="42" height="42" rx="2" fill="white"/>
+        <rect x="138" y="22" width="30" height="30" rx="1" fill="#111"/>
+        <!-- Finder BL -->
+        <rect x="10" y="126" width="54" height="54" rx="4" fill="#111"/>
+        <rect x="16" y="132" width="42" height="42" rx="2" fill="white"/>
+        <rect x="22" y="138" width="30" height="30" rx="1" fill="#111"/>
+        <!-- Data modules -->
+        <rect x="76" y="10" width="8" height="8" fill="#111"/><rect x="88" y="10" width="8" height="8" fill="#111"/>
+        <rect x="100" y="10" width="8" height="8" fill="#111"/><rect x="76" y="22" width="8" height="8" fill="#111"/>
+        <rect x="100" y="22" width="8" height="8" fill="#111"/><rect x="76" y="34" width="8" height="8" fill="#111"/>
+        <rect x="88" y="34" width="8" height="8" fill="#111"/><rect x="76" y="46" width="8" height="8" fill="#111"/>
+        <rect x="100" y="46" width="8" height="8" fill="#111"/><rect x="88" y="58" width="8" height="8" fill="#111"/>
+        <rect x="10" y="76" width="8" height="8" fill="#111"/><rect x="22" y="76" width="8" height="8" fill="#111"/>
+        <rect x="46" y="76" width="8" height="8" fill="#111"/><rect x="76" y="76" width="8" height="8" fill="#111"/>
+        <rect x="100" y="76" width="8" height="8" fill="#111"/><rect x="124" y="76" width="8" height="8" fill="#111"/>
+        <rect x="148" y="76" width="8" height="8" fill="#111"/><rect x="172" y="76" width="8" height="8" fill="#111"/>
+        <rect x="10" y="88" width="8" height="8" fill="#111"/><rect x="34" y="88" width="8" height="8" fill="#111"/>
+        <rect x="58" y="88" width="8" height="8" fill="#111"/><rect x="88" y="88" width="8" height="8" fill="#111"/>
+        <rect x="112" y="88" width="8" height="8" fill="#111"/><rect x="136" y="88" width="8" height="8" fill="#111"/>
+        <rect x="160" y="88" width="8" height="8" fill="#111"/>
+        <rect x="10" y="100" width="8" height="8" fill="#111"/><rect x="22" y="100" width="8" height="8" fill="#111"/>
+        <rect x="58" y="100" width="8" height="8" fill="#111"/><rect x="100" y="100" width="8" height="8" fill="#111"/>
+        <rect x="124" y="100" width="8" height="8" fill="#111"/><rect x="148" y="100" width="8" height="8" fill="#111"/>
+        <rect x="76" y="112" width="8" height="8" fill="#111"/><rect x="100" y="112" width="8" height="8" fill="#111"/>
+        <rect x="124" y="112" width="8" height="8" fill="#111"/><rect x="160" y="112" width="8" height="8" fill="#111"/>
+        <rect x="76" y="124" width="8" height="8" fill="#111"/><rect x="112" y="124" width="8" height="8" fill="#111"/>
+        <rect x="136" y="124" width="8" height="8" fill="#111"/><rect x="160" y="124" width="8" height="8" fill="#111"/>
+        <rect x="76" y="136" width="8" height="8" fill="#111"/><rect x="88" y="136" width="8" height="8" fill="#111"/>
+        <rect x="124" y="136" width="8" height="8" fill="#111"/><rect x="148" y="136" width="8" height="8" fill="#111"/>
+        <rect x="76" y="148" width="8" height="8" fill="#111"/><rect x="100" y="148" width="8" height="8" fill="#111"/>
+        <rect x="112" y="148" width="8" height="8" fill="#111"/><rect x="136" y="148" width="8" height="8" fill="#111"/>
+        <rect x="76" y="160" width="8" height="8" fill="#111"/><rect x="88" y="160" width="8" height="8" fill="#111"/>
+        <rect x="112" y="160" width="8" height="8" fill="#111"/><rect x="160" y="160" width="8" height="8" fill="#111"/>
+        <rect x="76" y="172" width="8" height="8" fill="#111"/><rect x="100" y="172" width="8" height="8" fill="#111"/>
+        <rect x="136" y="172" width="8" height="8" fill="#111"/><rect x="172" y="172" width="8" height="8" fill="#111"/>
+      </svg>
+    </div>
+    <div class="qr-footer">
+      <div class="qr-hint">📡 Válido para hoy · 2026-04-30</div>
+      <div class="qr-trip">Acapulco · 13:00 hs</div>
+    </div>
+  </div>
+  <div class="tab-bar">
+    <div class="tab" onclick="goTo('s1')"><span class="tab-icon">🏠</span><span class="tab-label">Inicio</span></div>
+    <div class="tab" onclick="goTo('s2')"><span class="tab-icon">🗓️</span><span class="tab-label">Reservar</span></div>
+    <div class="tab" onclick="goTo('sMisViajes')"><span class="tab-icon">🧾</span><span class="tab-label">Mis viajes</span></div>
+    <div class="tab active"><span class="tab-icon">📲</span><span class="tab-label">Mi QR</span></div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- S9: NOTICIAS                                                      -->
+<!-- ================================================================ -->
+<div class="screen" id="sNoticias">
+  <div class="topbar"><button class="back-btn" onclick="goTo('s1')">←</button><h1>Noticias</h1></div>
+  <div class="content">
+    <div class="section-title">Últimas novedades</div>
+    <div class="noticia-card">
+      <div class="noticia-header">
+        <div style="display:flex;align-items:center;">
+          <div class="noticia-logo">🚐</div>
+          <span class="noticia-nombre">Centro Bus</span>
+        </div>
+        <span class="noticia-fecha">30/04/2026</span>
+      </div>
+      <div class="noticia-titulo">Nuevo horario nocturno disponible</div>
+      <div class="noticia-body">A partir del lunes 4 de mayo incorporamos el servicio de las 21:00 hs para el recorrido Acapulco. Reservas habilitadas desde hoy.</div>
+      <span class="noticia-tag noticia-tag-novedad">📢 Novedad</span>
+    </div>
+    <div class="noticia-card">
+      <div class="noticia-header">
+        <div style="display:flex;align-items:center;">
+          <div class="noticia-logo">🚐</div>
+          <span class="noticia-nombre">Centro Bus</span>
+        </div>
+        <span class="noticia-fecha">28/04/2026</span>
+      </div>
+      <div class="noticia-titulo">Feriado 1 de Mayo — servicio reducido</div>
+      <div class="noticia-body">El jueves 1 de mayo operará únicamente el viaje de las 09:00 hs. Recordá actualizar tu reserva si viajás ese día.</div>
+      <span class="noticia-tag noticia-tag-aviso">⚠️ Aviso</span>
+    </div>
+    <div class="noticia-card">
+      <div class="noticia-header">
+        <div style="display:flex;align-items:center;">
+          <div class="noticia-logo">🚐</div>
+          <span class="noticia-nombre">Centro Bus</span>
+        </div>
+        <span class="noticia-fecha">25/04/2026</span>
+      </div>
+      <div class="noticia-titulo">Actualización del sistema</div>
+      <div class="noticia-body">Realizamos mejoras en la app para optimizar la experiencia de reserva y seguimiento en tiempo real.</div>
+      <span class="noticia-tag noticia-tag-sistema">🔧 Sistema</span>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- S10: PRECIOS                                                      -->
+<!-- ================================================================ -->
+<div class="screen" id="sPrecios">
+  <div class="topbar"><button class="back-btn" onclick="goTo('s1')">←</button><h1>Precios · Centro Bus</h1></div>
+  <div class="content">
+    <div class="section-title">Tarifas vigentes</div>
+    <div class="precio-card">
+      <div class="precio-amount">$2.500</div>
+      <div class="precio-divider"></div>
+      <div><div class="precio-label">1 Viaje</div><div class="precio-sub">Tarifa unitaria</div></div>
+    </div>
+    <div class="precio-card">
+      <div class="precio-amount">$950</div>
+      <div class="precio-divider"></div>
+      <div><div class="precio-label">10 Viajes</div><div class="precio-sub">Paquete económico</div></div>
+    </div>
+    <div class="precio-card">
+      <div class="precio-amount">$3.600</div>
+      <div class="precio-divider"></div>
+      <div><div class="precio-label">40 Viajes</div><div class="precio-sub">Abono mensual completo</div></div>
+    </div>
+    <div class="precio-card">
+      <div class="precio-amount">$1.000</div>
+      <div class="precio-divider"></div>
+      <div><div class="precio-label">Eventual</div><div class="precio-sub">Pago a bordo</div></div>
+    </div>
+    <div class="precio-card">
+      <div class="precio-amount">$700</div>
+      <div class="precio-divider"></div>
+      <div><div class="precio-label">Taquilla</div><div class="precio-sub">Pago en boletería</div></div>
+    </div>
+    <div class="precio-card">
+      <div class="precio-amount">$10</div>
+      <div class="precio-divider"></div>
+      <div><div class="precio-label">Aeropuerto – Hotel</div><div class="precio-sub">Servicio especial</div></div>
+    </div>
+    <div class="precio-card">
+      <div class="precio-amount">$7</div>
+      <div class="precio-divider"></div>
+      <div><div class="precio-label">Precio Mínimo</div><div class="precio-sub">Tarifa base</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- S11A: LISTA VIAJES → PARADAS                                      -->
+<!-- ================================================================ -->
+<div class="screen" id="sListaParadas">
+  <div class="topbar"><button class="back-btn" onclick="goTo('s1')">←</button><h1>Paradas</h1></div>
+  <div class="content">
+    <div class="section-title">Seleccioná un viaje</div>
+    <div class="trip-card" onclick="goTo('sDetalleParadas')">
+      <div class="trip-time">06:00</div>
+      <div class="trip-route">📍 Inversiones 180</div>
+      <div class="trip-tags"><span class="tag tag-green">🌅 Mañana</span></div>
+    </div>
+    <div class="trip-card" onclick="goTo('sDetalleParadas')">
+      <div class="trip-time">13:00</div>
+      <div class="trip-route">📍 Acapulco</div>
+      <div class="trip-tags"><span class="tag tag-green">☀️ Tarde</span></div>
+    </div>
+    <div class="trip-card disabled-card">
+      <div class="trip-time" style="color:var(--muted);">18:00</div>
+      <div class="trip-route" style="color:var(--muted);">📍 Centro</div>
+      <div class="trip-tags"><span class="tag tag-gray">Sin disponibilidad</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- S11B: DETALLE PARADAS                                             -->
+<!-- ================================================================ -->
+<div class="screen" id="sDetalleParadas">
+  <div class="topbar"><button class="back-btn" onclick="goTo('sListaParadas')">←</button><h1>Inversiones 180 · 06:00</h1></div>
+  <div class="content">
+    <div class="section-title">Recorrido del servicio</div>
+    <div class="route-container">
+      <div class="route-line"></div>
+      <div class="stop-row">
+        <div class="stop-dot"></div>
+        <div class="stop-card">
+          <div class="stop-name">Carrera 21</div>
+          <div class="stop-detail">Carrera 21 esq. Ruta 7, Merlo</div>
+          <span class="stop-badge stop-badge-green">🟢 Inicio · 05:55</span>
+        </div>
+      </div>
+      <div class="stop-row">
+        <div class="stop-dot"></div>
+        <div class="stop-card">
+          <div class="stop-name">Carrera 23 A</div>
+          <div class="stop-detail">Carrera 23 A, Sector V, Moreno</div>
+          <span class="stop-badge stop-badge-green">📍 Parada · 05:58</span>
+        </div>
+      </div>
+      <div class="stop-row">
+        <div class="stop-dot"></div>
+        <div class="stop-card">
+          <div class="stop-name">General Anaya</div>
+          <div class="stop-detail">Av. General Anaya 450</div>
+          <span class="stop-badge stop-badge-green">📍 Parada · 06:10</span>
+        </div>
+      </div>
+      <div class="stop-row">
+        <div class="stop-dot end"></div>
+        <div class="stop-card end">
+          <div class="stop-name">Inversiones 180</div>
+          <div class="stop-detail">Acceso Oeste km 25, Luján</div>
+          <span class="stop-badge stop-badge-yellow">🏁 Destino · 06:45</span>
+        </div>
+      </div>
+    </div>
+    <div style="background:var(--white);border-radius:16px;padding:14px 16px;margin-top:8px;display:flex;align-items:center;gap:12px;border:1.5px solid var(--border);">
+      <span style="font-size:26px;">🚐</span>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--text);">4 paradas</div>
+        <div style="font-size:12px;color:var(--muted);">Duración estimada: dato del backend</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- S12A: LISTA VIAJES → LLEGADAS                                     -->
+<!-- ================================================================ -->
+<div class="screen" id="sListaLlegadas">
+  <div class="topbar"><button class="back-btn" onclick="goTo('s1')">←</button><h1>Llegadas</h1></div>
+  <div class="content">
+    <div class="section-title">Seleccioná un viaje para seguir</div>
+    <div class="trip-card" onclick="goTo('sSeguimiento')">
+      <div class="trip-time">06:00</div>
+      <div class="trip-route">📍 Inversiones 180</div>
+      <div class="trip-tags"><span class="tag tag-green">🌅 Mañana</span></div>
+    </div>
+    <div class="trip-card" onclick="goTo('sSeguimiento')">
+      <div class="trip-time">13:00</div>
+      <div class="trip-route">📍 Acapulco</div>
+      <div class="trip-tags"><span class="tag tag-green">☀️ Tarde</span></div>
+    </div>
+    <div class="trip-card disabled-card">
+      <div class="trip-time" style="color:var(--muted);">18:00</div>
+      <div class="trip-route" style="color:var(--muted);">📍 Centro</div>
+      <div class="trip-tags"><span class="tag tag-gray">Sin disponibilidad</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- S12B: SEGUIMIENTO EN MAPA                                         -->
+<!-- ================================================================ -->
+<div class="screen" id="sSeguimiento">
+  <div class="topbar">
+    <button class="back-btn" onclick="goTo('sListaLlegadas')">←</button>
+    <h1>Inversiones 180 · 06:00</h1>
+    <button class="refresh-btn" id="refreshBtn" onclick="triggerRefresh()">↻</button>
+  </div>
+  <div class="map-status-bar">
+    <div class="pulse"></div>
+    <span>Actualizando en tiempo real</span>
+    <span class="eta-pill">~3 min</span>
+  </div>
+  <div class="map-area">
+    <!-- Mapa SVG simulado -->
+    <svg class="map-svg" viewBox="0 0 390 360" xmlns="http://www.w3.org/2000/svg">
+      <rect width="390" height="360" fill="#f0ebe0"/>
+      <!-- Bloques urbanos -->
+      <rect x="0" y="0" width="85" height="55" rx="3" fill="#e4ddd0" opacity="0.8"/>
+      <rect x="95" y="0" width="110" height="40" rx="3" fill="#e4ddd0" opacity="0.8"/>
+      <rect x="215" y="8" width="90" height="50" rx="3" fill="#e4ddd0" opacity="0.8"/>
+      <rect x="315" y="0" width="75" height="55" rx="3" fill="#e4ddd0" opacity="0.8"/>
+      <rect x="0" y="75" width="65" height="80" rx="3" fill="#e4ddd0" opacity="0.8"/>
+      <rect x="75" y="65" width="130" height="65" rx="3" fill="#e4ddd0" opacity="0.8"/>
+      <rect x="220" y="68" width="85" height="70" rx="3" fill="#e4ddd0" opacity="0.8"/>
+      <rect x="316" y="60" width="74" height="90" rx="3" fill="#e4ddd0" opacity="0.8"/>
+      <rect x="0" y="175" width="75" height="70" rx="3" fill="#e4ddd0" opacity="0.8"/>
+      <rect x="90" y="168" width="115" height="80" rx="3" fill="#e4ddd0" opacity="0.8"/>
+      <rect x="218" y="175" width="85" height="65" rx="3" fill="#e4ddd0" opacity="0.8"/>
+      <rect x="316" y="168" width="74" height="80" rx="3" fill="#e4ddd0" opacity="0.8"/>
+      <rect x="0" y="270" width="100" height="90" rx="3" fill="#e4ddd0" opacity="0.8"/>
+      <rect x="115" y="265" width="120" height="95" rx="3" fill="#e4ddd0" opacity="0.8"/>
+      <rect x="250" y="262" width="140" height="98" rx="3" fill="#e4ddd0" opacity="0.8"/>
+      <!-- Parque -->
+      <rect x="310" y="178" width="80" height="78" rx="8" fill="#c4d9a8" opacity="0.85"/>
+      <text x="350" y="222" font-size="9" fill="#4a7a2e" font-weight="600" text-anchor="middle">PARQUE</text>
+      <!-- Ruta 7 principal -->
+      <rect x="0" y="148" width="390" height="14" fill="#d4a843" opacity="0.6"/>
+      <rect x="0" y="151" width="390" height="8"  fill="#f5c842" opacity="0.5"/>
+      <rect x="8" y="144" width="30" height="20" rx="4" fill="#e8a020"/>
+      <text x="23" y="158" font-size="10" fill="white" font-weight="700" text-anchor="middle">7</text>
+      <!-- Calles horizontales -->
+      <rect x="0" y="58"  width="390" height="5" fill="white" opacity="0.9"/>
+      <rect x="0" y="59"  width="390" height="3" fill="#ccc5b5" opacity="0.6"/>
+      <rect x="0" y="254" width="390" height="5" fill="white" opacity="0.9"/>
+      <rect x="0" y="255" width="390" height="3" fill="#ccc5b5" opacity="0.6"/>
+      <!-- Calles verticales -->
+      <rect x="73"  y="0" width="5" height="360" fill="white" opacity="0.9"/>
+      <rect x="74"  y="0" width="3" height="360" fill="#ccc5b5" opacity="0.6"/>
+      <rect x="208" y="0" width="6" height="360" fill="white" opacity="0.95"/>
+      <rect x="209" y="0" width="4" height="360" fill="#ccc5b5" opacity="0.6"/>
+      <rect x="313" y="0" width="5" height="360" fill="white" opacity="0.9"/>
+      <rect x="314" y="0" width="3" height="360" fill="#ccc5b5" opacity="0.6"/>
+      <!-- Ruta del colectivo (línea verde) -->
+      <polyline points="30,310 78,310 78,155 211,155 211,72 290,72" stroke="#00C853" stroke-width="4.5" fill="none" stroke-dasharray="10,5" stroke-linecap="round"/>
+      <!-- Paradas -->
+      <circle cx="78"  cy="310" r="9" fill="white" stroke="#00C853" stroke-width="3"/>
+      <text x="78" y="314" font-size="9" fill="#00A844" font-weight="800" text-anchor="middle">P</text>
+      <text x="100" y="306" font-size="8" fill="#444" font-weight="600">Carrera 21</text>
+      <circle cx="78"  cy="155" r="9" fill="white" stroke="#00C853" stroke-width="3"/>
+      <text x="78" y="159" font-size="9" fill="#00A844" font-weight="800" text-anchor="middle">P</text>
+      <text x="96"  y="146" font-size="8" fill="#444" font-weight="600">Carrera 23A</text>
+      <circle cx="211" cy="72"  r="9" fill="white" stroke="#00C853" stroke-width="3"/>
+      <text x="211" y="76" font-size="9" fill="#00A844" font-weight="800" text-anchor="middle">P</text>
+      <text x="226" y="64"  font-size="8" fill="#444" font-weight="600">Gral. Anaya</text>
+      <!-- Destino -->
+      <circle cx="290" cy="72" r="14" fill="#FFB300" stroke="white" stroke-width="2"/>
+      <text x="290" y="78" font-size="13" text-anchor="middle">🏁</text>
+      <!-- VAN animada -->
+      <g class="van-marker">
+        <ellipse cx="0" cy="13" rx="18" ry="6" fill="rgba(0,0,0,0.12)"/>
+        <rect x="-18" y="-12" width="36" height="22" rx="6" fill="#1A1A2E"/>
+        <rect x="-15" y="-9"  width="30" height="16" rx="5" fill="#00C853"/>
+        <rect x="-12" y="-7"  width="16" height="9"  rx="2" fill="#B3F0D0" opacity="0.9"/>
+        <circle cx="-9"  cy="11" r="5" fill="#333"/>
+        <circle cx="9"   cy="11" r="5" fill="#333"/>
+        <circle cx="-9"  cy="11" r="2.5" fill="#666"/>
+        <circle cx="9"   cy="11" r="2.5" fill="#666"/>
+        <rect x="16"  y="-5"  width="4" height="7" rx="1" fill="#FFF176"/>
+      </g>
+      <!-- Labels zonas -->
+      <text x="155" y="30"  font-size="9" fill="#aaa" font-weight="600" text-anchor="middle">SECTOR V</text>
+      <text x="35"  y="210" font-size="8" fill="#aaa" font-weight="600" text-anchor="middle">AGUA DE ORO</text>
+      <text x="350" y="130" font-size="8" fill="#aaa" font-weight="600" text-anchor="middle">CUARTEL V</text>
+      <text x="180" y="300" font-size="9" fill="#aaa" font-weight="600" text-anchor="middle">LA REJA</text>
+    </svg>
+
+    <!-- Panel inferior del mapa -->
+    <div class="map-overlay">
+      <div style="display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:14px;">
+        <div>
+          <div class="map-overlay-title">En camino a tu parada</div>
+          <div class="map-overlay-sub">Próxima: <strong style="color:var(--green-dark);">Carrera 23 A</strong></div>
+        </div>
+        <div style="text-align:right;">
+          <div class="eta-big">~3 min</div>
+          <div class="eta-unit">tiempo estimado</div>
+        </div>
+      </div>
+      <div class="stop-list-mini">
+        <div class="stop-mini">
+          <div class="mini-dot" style="background:#9CA3AF;"></div>
+          <div style="flex:1;">
+            <div class="mini-name done">Carrera 21</div>
+            <div class="mini-time">05:55 · Pasada</div>
+          </div>
+          <span class="mini-eta mini-eta-done">✓</span>
+        </div>
+        <div class="stop-mini current">
+          <div class="mini-dot" style="background:var(--green);"></div>
+          <div style="flex:1;">
+            <div class="mini-name">Carrera 23 A</div>
+            <div class="mini-time">05:58 · En camino</div>
+          </div>
+          <span class="mini-eta mini-eta-green">~3 min</span>
+        </div>
+        <div class="stop-mini">
+          <div class="mini-dot" style="background:var(--border);"></div>
+          <div style="flex:1;">
+            <div class="mini-name">General Anaya</div>
+            <div class="mini-time">06:10 · Estimado</div>
+          </div>
+          <span class="mini-eta mini-eta-light">~12 min</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /phone -->
+
+<!-- ================================================================ -->
+<!-- JAVASCRIPT                                                        -->
+<!-- ================================================================ -->
+<script>
+// ── Navegación ──────────────────────────────────────────────────────
+function goTo(id) {
+  document.querySelectorAll('.screen').forEach(function(s) {
+    s.classList.remove('active');
+  });
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ── Tipo de reserva ─────────────────────────────────────────────────
+var tipoSel = null;
+function selectType(t) {
+  tipoSel = t;
+  ['tc1','tc2'].forEach(function(x) { document.getElementById(x).classList.remove('selected'); });
+  ['rd1','rd2'].forEach(function(x) { document.getElementById(x).classList.remove('on'); });
+  if (t === 'mensual') {
+    document.getElementById('tc1').classList.add('selected');
+    document.getElementById('rd1').classList.add('on');
+  } else {
+    document.getElementById('tc2').classList.add('selected');
+    document.getElementById('rd2').classList.add('on');
+  }
+}
+function goToDias() {
+  if (!tipoSel) return;
+  if (tipoSel === 'mensual') {
+    goTo('sMensual');
+  } else {
+    buildDiaria();
+    goTo('sDiaria');
+  }
+}
+
+// ── Días semana (Mensual) ────────────────────────────────────────────
+var wDays = new Set();
+var wNames = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+function toggleWDay(d) {
+  var el = document.querySelector('[data-d="' + d + '"]');
+  if (wDays.has(d)) { wDays.delete(d); el.classList.remove('selected'); }
+  else              { wDays.add(d);    el.classList.add('selected'); }
+  var c = document.getElementById('wPills');
+  if (wDays.size === 0) {
+    c.innerHTML = '<span style="color:var(--muted);font-size:13px;">Ningún día seleccionado</span>';
+    return;
+  }
+  c.innerHTML = '';
+  [0,1,2,3,4,5,6].forEach(function(i) {
+    if (wDays.has(i)) {
+      var s = document.createElement('span');
+      s.className = 'pill';
+      s.textContent = wNames[i];
+      c.appendChild(s);
+    }
+  });
+}
+
+// ── Próximos 10 días (Diaria) ────────────────────────────────────────
+var dnES = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+function pad(n) { return String(n).padStart(2, '0'); }
+function buildDiaria() {
+  var list = document.getElementById('diasList');
+  list.innerHTML = '';
+  var d = new Date(2026, 3, 30); // 30-abr-2026
+  for (var i = 0; i < 10; i++) {
+    var dow      = d.getDay();
+    var dateStr  = d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+    var dayName  = dnES[dow];
+    var row      = document.createElement('div');
+    row.className = 'day-row';
+    row.innerHTML =
+      '<div class="day-av">' + dayName[0] + '</div>' +
+      '<div class="day-info"><strong>' + dayName + '</strong><small>' + dateStr + '</small></div>' +
+      '<span class="day-check">✓</span>';
+    (function(r) {
+      r.onclick = function() {
+        document.querySelectorAll('.day-row').forEach(function(x) { x.classList.remove('selected'); });
+        r.classList.add('selected');
+      };
+    })(row);
+    list.appendChild(row);
+    d.setDate(d.getDate() + 1);
+  }
+}
+
+// ── Pago ─────────────────────────────────────────────────────────────
+var pagoSel = null;
+function selectPago(p) {
+  pagoSel = p;
+  ['p1','p2'].forEach(function(x)  { document.getElementById(x).classList.remove('selected'); });
+  ['pr1','pr2'].forEach(function(x) { document.getElementById(x).classList.remove('on'); });
+  if (p === 'eventual') {
+    document.getElementById('p1').classList.add('selected');
+    document.getElementById('pr1').classList.add('on');
+  } else {
+    document.getElementById('p2').classList.add('selected');
+    document.getElementById('pr2').classList.add('on');
+  }
+}
+
+// ── Mis Viajes tabs ───────────────────────────────────────────────────
+function switchViajes(tab) {
+  document.getElementById('tw1').classList.toggle('active', tab === 'futuras');
+  document.getElementById('tw2').classList.toggle('active', tab === 'pasadas');
+  document.getElementById('vFuturas').style.display = tab === 'futuras' ? 'block' : 'none';
+  document.getElementById('vPasadas').style.display = tab === 'pasadas' ? 'block' : 'none';
+}
+
+// ── Refresh mapa ──────────────────────────────────────────────────────
+function triggerRefresh() {
+  var btn = document.getElementById('refreshBtn');
+  btn.style.transition = 'transform 0.5s ease';
+  btn.style.transform  = 'rotate(360deg)';
+  setTimeout(function() {
+    btn.style.transition = '';
+    btn.style.transform  = '';
+  }, 520);
+}
+
+// ── Init ──────────────────────────────────────────────────────────────
+selectType('diaria');
+buildDiaria();
+</script>
+</body>
+</html>
